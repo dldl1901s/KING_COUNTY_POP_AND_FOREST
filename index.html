@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Map Design</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            margin-top: 20px;
+            margin-left: 20px;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: bold;
+            font-size: 30pt;
+            -webkit-text-stroke: 1px #ffffff;
+            color: rgb(0, 0, 0)
+        }
+
+
+        
+        #menu {
+            background: rgb(212, 212, 212);
+            position: absolute;
+            z-index: 1;
+            top: 10px;
+            right: 50px;
+            border-radius: 3px;
+            width: 120px;
+            border: 1px solid rgba(83, 83, 83, 0.4);
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        #description {
+            background: rgb(131, 131, 131, 0.8);
+            border-radius: 5px;
+            position: absolute;
+            top: 90px;
+            left: 0;
+            z-index: 1;
+            margin-top: 20px;
+            margin-left: 20px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 15pt;
+            color: rgb(253, 253, 253)
+        }
+
+       
+        #menu a {
+            font-size: 13px;
+            color: #404040;
+            display: block;
+            margin: 0;
+            padding: 0;
+            padding: 10px;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+
+        
+        #menu a:last-child {
+            border: none;
+        }
+
+        
+        #menu a:hover {
+            background-color: #c5c5c5;
+            color: #404040;
+        }
+
+        #menu a.active {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        #menu a.active:hover {
+            background: #2b2b2b;
+        }
+    </style>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
+</head>
+
+<body>
+    <div id="title">
+        KING COUNTY POP AND FOREST
+    </div>
+    <div id="description">
+        This map shows the<br> population and<br>forest distribution<br>of King County,<br> Washington.
+    </div>
+    <nav id="menu"></nav>
+    <div id='map'></div>
+    <script type="text/javascript">
+        mapboxgl.accessToken =
+            'pk.eyJ1IjoiamFrb2J6aGFvIiwiYSI6ImNpcms2YWsyMzAwMmtmbG5icTFxZ3ZkdncifQ.P9MBej1xacybKcDN_jehvw';
+        let map = new mapboxgl.Map({
+            container: 'map', // 
+            style: 'mapbox://styles/mapbox/dark-v10',
+            zoom: 9, 
+            center: [-122.2559435, 47.6002614] 
+        });
+
+        map.on('load', () => { 
+
+            map.addSource('base-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'tiles/tile sets 1/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Map tiles designed by Bo Zhao</a>'
+            });
+
+            map.addSource('pop-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'tiles/tile sets 2/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Map tiles designed by Bo Zhao'
+            });
+
+            map.addSource('basePop-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'tiles/tile sets 3/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Map tiles designed by Bo Zhao'
+            });
+
+            map.addSource('forest-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'tiles/tile sets 4/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Map tiles designed by Bo Zhao'
+            });
+
+            map.addLayer({
+                'id': 'base',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'base-tiles'
+            });
+
+            map.addLayer({
+                'id': 'pop',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'pop-tiles'
+            });
+
+            map.addLayer({
+                'id': 'basePop',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'basePop-tiles'
+            });
+
+            map.addLayer({
+                'id': 'forest',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'forest-tiles'
+            });
+        });
+
+        
+        map.on('idle', () => {
+
+            
+            if (!map.getLayer('base') || !map.getLayer('pop') || !map.getLayer('basePop') || !map.getLayer('forest')) {
+                return;
+            }
+
+            
+            const toggleableLayerIds = ['base', 'pop', 'basePop', 'forest'];
+
+           
+            for (const id of toggleableLayerIds) {
+                
+                if (document.getElementById(id)) {
+                    continue;
+                }
+
+                
+                const link = document.createElement('a');
+                link.id = id;
+                link.href = '#';
+                link.textContent = id;
+                link.className = 'inactive';
+
+                
+                link.onclick = function (e) {
+                    const clickedLayer = this.textContent;
+                    
+                    e.preventDefault();
+                    
+                    e.stopPropagation();
+
+                    const visibility = map.getLayoutProperty(
+                        clickedLayer,
+                        'visibility'
+                    );
+
+                    
+                    if (visibility === 'visible') {
+                        map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                        this.className = '';
+                    } else { 
+                        this.className = 'active';
+                        map.setLayoutProperty(
+                            clickedLayer,
+                            'visibility',
+                            'visible'
+                        );
+                    }
+                };
+
+                
+                const layers = document.getElementById('menu');
+                layers.appendChild(link);
+            }
+        });
+        map.addControl(new mapboxgl.ScaleControl());
+        map.addControl(new mapboxgl.NavigationControl({position: 'top-left'}));
+        
+    </script>
+</body>
+
+</html>

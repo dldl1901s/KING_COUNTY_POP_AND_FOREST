@@ -3,7 +3,7 @@
 This [map] shows the population and forest distribution of King County, Washington, where University of Washington is located.
 
 [map]: https://dldl1901s.github.io/KING_COUNTY_POP_AND_FOREST/
-There are 4 map layers in this map.
+There are 4 map layers in this map. Each layers are avilable with 1 to 8 zoom level.
 
 The first map layer is base map layer with white background and black border line. It clearly shows the border lines and street of Kingcouny.
 ![map1](https://github.com/dldl1901s/KING_COUNTY_POP_AND_FOREST/blob/main/img/map1.png?raw=true "map 1")
